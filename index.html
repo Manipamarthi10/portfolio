@@ -4,11 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manikanta's Portfolio</title>
-    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts - Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <!-- React and Babel CDNs -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -23,14 +20,17 @@
     <div id="root"></div>
 
     <script type="text/babel">
-        // Import necessary components from lucide-react (simulated as they are not directly available in CDN for individual import)
-        // For this self-contained HTML, we will use inline SVGs for icons
-        // The previous import { ChevronDown, ExternalLink } from 'lucide-react'; is removed as it won't work in this setup.
-
         // Main App component for the portfolio
         const App = () => {
           // State for navigation to handle different sections
           const [activeSection, setActiveSection] = React.useState('home');
+
+          // Refs for each section to observe
+          const homeRef = React.useRef(null);
+          const aboutRef = React.useRef(null);
+          const skillsRef = React.useRef(null);
+          const projectsRef = React.useRef(null);
+          const contactRef = React.useRef(null);
 
           // State for contact form inputs
           const [name, setName] = React.useState('');
@@ -43,7 +43,11 @@
             const section = document.getElementById(sectionId);
             if (section) {
               section.scrollIntoView({ behavior: 'smooth' });
-              setActiveSection(sectionId); // Update active section in state
+              // Set active section after a short delay to allow scroll animation
+              // and prevent immediate override by IntersectionObserver if scroll ends mid-section
+              setTimeout(() => {
+                setActiveSection(sectionId);
+              }, 300); // Adjust delay as needed
             }
           };
 
@@ -68,6 +72,51 @@
               window.removeEventListener('hashchange', handleHashChange);
             };
           }, []);
+
+          // Effect for IntersectionObserver to update active section on scroll
+          React.useEffect(() => {
+            const sections = [homeRef, aboutRef, skillsRef, projectsRef, contactRef];
+            const observerOptions = {
+              root: null, // relative to the viewport
+              rootMargin: '0px 0px -50% 0px', // When section midpoint reaches viewport midpoint
+              threshold: 0 // as soon as even 1 pixel is visible
+            };
+
+            const handleObserver = (entries) => {
+              entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                  // Only set active if the section is truly the primary one in view
+                  // This simple logic assumes the topmost intersecting section is the active one.
+                  // For more complex scenarios, you might check entry.boundingClientRect.top
+                  // to find the one closest to the top of the viewport.
+                  const currentActive = sections.find(
+                    ref => ref.current && ref.current.id === entry.target.id
+                  );
+                  if (currentActive) {
+                    setActiveSection(currentActive.current.id);
+                  }
+                }
+              });
+            };
+
+            const observer = new IntersectionObserver(handleObserver, observerOptions);
+
+            // Observe each section
+            sections.forEach(ref => {
+              if (ref.current) {
+                observer.observe(ref.current);
+              }
+            });
+
+            // Cleanup function for the observer
+            return () => {
+              sections.forEach(ref => {
+                if (ref.current) {
+                  observer.unobserve(ref.current);
+                }
+              });
+            };
+          }, []); // Empty dependency array means this runs once on mount
 
           // Function to handle form submission
           const handleSubmit = (e) => {
@@ -183,7 +232,8 @@
               {/* Hero Section */}
               <section
                 id="home"
-                className="h-screen flex flex-col items-center justify-center text-center bg-white pt-20" // Added pt-20 for nav bar
+                ref={homeRef}
+                className="h-screen flex flex-col items-center justify-center text-center bg-white pt-20"
               >
                 <div className="p-8 max-w-3xl mx-auto">
                   {/* Profile Circle with Initials */}
@@ -207,7 +257,7 @@
               </section>
 
               {/* About Section */}
-              <section id="about" className="py-20 bg-gray-50">
+              <section id="about" ref={aboutRef} className="py-20 bg-gray-50">
                 <div className="container mx-auto px-4">
                   <h2 className="text-4xl font-bold text-center text-gray-900 mb-12 relative">
                     About Me
@@ -250,7 +300,7 @@
               </section>
 
               {/* Skills Section */}
-              <section id="skills" className="py-20 bg-white">
+              <section id="skills" ref={skillsRef} className="py-20 bg-white">
                 <div className="container mx-auto px-4">
                   <h2 className="text-4xl font-bold text-center text-gray-900 mb-12 relative">
                     Skills & Expertise
@@ -261,8 +311,8 @@
                     <div className="bg-gray-50 p-6 rounded-xl shadow-lg border border-gray-200">
                       <h3 className="text-2xl font-semibold text-gray-900 mb-4">Programming Languages</h3>
                       <ul className="list-disc list-inside text-gray-700 space-y-2">
-                        <li>Java</li>
                         <li>Python</li>
+                        <li>Java</li>
                         <li>SQL</li>
                         <li>C</li>
                         <li>DSA using Python</li>
@@ -295,38 +345,17 @@
               </section>
 
               {/* Projects Section */}
-              <section id="projects" className="py-20 bg-gray-50">
+              <section id="projects" ref={projectsRef} className="py-20 bg-gray-50">
                 <div className="container mx-auto px-4">
                   <h2 className="text-4xl font-bold text-center text-gray-900 mb-12 relative">
                     Featured Projects
                     <span className="block w-20 h-1 bg-blue-700 mx-auto mt-2 rounded-full"></span>
                   </h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-                    {/* Project Card 1: Your Notes */}
-                    <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6 hover:shadow-xl transition-all duration-300">
-                      <div className="flex justify-between items-start mb-4">
-                        <h3 className="text-2xl font-semibold text-gray-900">Your Notes</h3>
-                        {/* Assuming a live link for "Your Notes" if available, otherwise, remove or link to GitHub */}
-                        <a href="#" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-blue-700 transition-colors duration-300">
-                          <ExternalLink size={20} />
-                        </a>
-                      </div>
-                      <p className="text-gray-700 mb-4">
-                        A notes-taking web app using Python, Flask, and web frameworks. Offers a clean UI to
-                        create, store, and manage notes.
-                      </p>
-                      <div className="flex flex-wrap gap-2">
-                        <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Python</span>
-                        <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Flask</span>
-                        <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">HTML/CSS</span>
-                        <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">JavaScript</span>
-                      </div>
-                    </div>
-                    {/* Project Card 2: Your Memories */}
+                    {/* Project Card: Your Memories */}
                     <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6 hover:shadow-xl transition-all duration-300">
                       <div className="flex justify-between items-start mb-4">
                         <h3 className="text-2xl font-semibold text-gray-900">Your Memories</h3>
-                        {/* Updated link for "Your Memories" project */}
                         <a href="https://github.com/Manipamarthi10/memory_web_app" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-blue-700 transition-colors duration-300">
                           <ExternalLink size={20} />
                         </a>
@@ -348,7 +377,7 @@
               </section>
 
               {/* Contact Section */}
-              <section id="contact" className="py-20 bg-white">
+              <section id="contact" ref={contactRef} className="py-20 bg-white">
                 <div className="container mx-auto px-4">
                   <h2 className="text-4xl font-bold text-center text-gray-900 mb-12 relative">
                     Get In Touch
@@ -469,4 +498,3 @@
     </script>
 </body>
 </html>
-
