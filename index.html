@@ -86,7 +86,6 @@
               entries.forEach(entry => {
                 if (entry.isIntersecting) {
                   // Only set active if the section is truly the primary one in view
-                  // This simple logic assumes the topmost intersecting section is the active one.
                   // For more complex scenarios, you might check entry.boundingClientRect.top
                   // to find the one closest to the top of the viewport.
                   const currentActive = sections.find(
@@ -325,6 +324,7 @@
                         <li>Python libraries</li>
                         <li>HTML/CSS/JS</li>
                         <li>Flask</li>
+                        <li>Django</li> {/* Added Django here */}
                         <li>Streamlit</li>
                         <li>Git</li>
                         <li>GitHub</li>
@@ -372,6 +372,30 @@
                         <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">JSON</span>
                       </div>
                     </div>
+
+                    {/* New Project Card: E-commerce Website (with Django) */}
+                    <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6 hover:shadow-xl transition-all duration-300">
+                      <div className="flex justify-between items-start mb-4">
+                        <h3 className="text-2xl font-semibold text-gray-900">E-commerce Website</h3>
+                        <a href="https://github.com/Manipamarthi10/Ecommerce_website" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-blue-700 transition-colors duration-300">
+                          <ExternalLink size={20} />
+                        </a>
+                      </div>
+                      <p className="text-gray-700 mb-4">
+                        A full-fledged e-commerce website built with **Django** for the backend,
+                        handling product management, user authentication, and order processing.
+                        The front-end is crafted with HTML, CSS, and JavaScript for a responsive
+                        and interactive shopping experience.
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Python</span>
+                        <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">Django</span>
+                        <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">HTML</span>
+                        <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">CSS</span>
+                        <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full">JavaScript</span>
+                      </div>
+                    </div>
+
                   </div>
                 </div>
               </section>
